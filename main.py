@@ -5,29 +5,34 @@ import pandas as pd #IMPORTING AND MANAGING DATA
 
 #importing the dataset
 dataset= pd.read_csv('train.csv', index_col=0)
+#getting rid of unnecessary attributes
 dataset = dataset.drop(['Name', 'Cabin', 'Ticket'], axis=1)
 
-X=dataset.iloc[:,1:].values #INDEPENDENT VARIABLES
-Y=dataset.iloc[:,0].values   #DEPENDENT VARIABLES
+#print(dataset.isnull().any())  
+#dropping rows with nan values in embarked attribute
+dataset = dataset.dropna(subset=['Embarked']) 
 
-#Handling missing data
-from sklearn.preprocessing import Imputer #IMPUTER HANDLES MISSING DATA
+#partitioning data into dependent and independent
+X=dataset.iloc[:,1:].values 
+Y=dataset.iloc[:,0].values
+
+#Handling missing data for the true attributes
+from sklearn.preprocessing import Imputer 
 imputer= Imputer(missing_values= 'NaN', strategy= 'mean' ,axis =1)
-#TODO IMPUTER=IMPUTER.. WHY?
-imputer=imputer.fit(X[:,2]) #upper bound is not included, this means col 2 
+imputer=imputer.fit(X[:,2]) #age
 X[:,2]=imputer.transform(X[:,2])
 
-#Encoding categorical data
+#Encoding categorical data-string datatype
 from sklearn.preprocessing import LabelEncoder
 number= LabelEncoder()
 X[:,1]=number.fit_transform(X[:,1].astype('str'))
 X[:,6]=number.fit_transform(X[:,6].astype('str'))
 
+#Encoding categorical data-int datatype
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-labelencoder_X= LabelEncoder() #LABELENCODER HELPS TO CATEGORISE DATA INTO 0,1,2 ..
+labelencoder_X= LabelEncoder() 
 X[:,0] =labelencoder_X.fit_transform(X[:,0])
-X[:,6] =labelencoder_X.fit_transform(X[:,6]) 
-onehotencoder=OneHotEncoder(categorical_features = [0]) #ONEHOTENCODER TRANFORMS THE CATEGORIACL DATA INTO VECTORS OF O AMD 1S
+onehotencoder=OneHotEncoder(categorical_features = [0,6]) 
 X = onehotencoder.fit_transform(X).toarray()
 
 #Splitting the data into training set and test set
@@ -37,8 +42,8 @@ X_train, X_test, Y_train, Y_test= train_test_split(X,Y , test_size= 0.25, random
 # Feature Scaling
 from sklearn.preprocessing import StandardScaler
 sc = StandardScaler()
-X_train = sc.fit_transform(X_train)
-X_test = sc.transform(X_test)
+X_train[:,7:] = sc.fit_transform(X_train[:,7:])
+X_test[:,7:] = sc.fit_transform(X_test[:,7:])
 
 # Fitting Logistic Regression to the Training set
 from sklearn.linear_model import LogisticRegression
@@ -58,4 +63,4 @@ from sklearn import model_selection
 import pickle
 filename = 'finalized_model_logistic_regression.sav'
 pickle.dump(classifier, open(filename, 'wb'))
- 
+
