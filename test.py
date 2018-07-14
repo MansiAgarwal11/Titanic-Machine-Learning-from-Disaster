@@ -46,6 +46,8 @@ loaded_model = pickle.load(open(filename, 'rb'))
 y_pred = loaded_model.predict(X)
 
 #creating csv file
-
-
-
+d= pd.read_csv('test.csv')
+d = d.drop(['Pclass','Name','Sex','Age','SibSp','Parch','Fare', 'Cabin', 'Ticket', 'Embarked'], axis=1)
+d['Survived'] = y_pred
+csv_name='log_reg'
+d.to_csv(csv_name, index=False)
