@@ -41,7 +41,7 @@ X[:,7:] = sc.fit_transform(X[:,7:])
 #predicting using model
 from sklearn import model_selection
 import pickle
-filename = 'finalized_model_logistic_regression.sav'
+filename = 'finalized_model_svm.sav'
 loaded_model = pickle.load(open(filename, 'rb'))
 y_pred = loaded_model.predict(X)
 
@@ -49,5 +49,5 @@ y_pred = loaded_model.predict(X)
 d= pd.read_csv('test.csv')
 d = d.drop(['Pclass','Name','Sex','Age','SibSp','Parch','Fare', 'Cabin', 'Ticket', 'Embarked'], axis=1)
 d['Survived'] = y_pred
-csv_name='log_reg'
+csv_name='SVM'
 d.to_csv(csv_name, index=False)
