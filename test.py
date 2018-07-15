@@ -38,16 +38,24 @@ from sklearn.preprocessing import StandardScaler
 sc = StandardScaler()
 X[:,7:] = sc.fit_transform(X[:,7:])
 
-#predicting using model
-from sklearn import model_selection
-import pickle
-filename = 'finalized_model_xgboost.sav'
-loaded_model = pickle.load(open(filename, 'rb'))
-y_pred = loaded_model.predict(X)
+import keras
+from keras.models import load_model
+# identical to the previous one
+model = load_model('finalised_model_ANN.h5')
+
+# Predicting the Test set results
+y_pred = model.predict(X)
+for i in range(0,418):
+    if y_pred[i]>0.5:
+        y_pred[i]=1
+    else:
+        y_pred[i]=0
+        
+y_pred = y_pred.astype(int)
 
 #creating csv file
 d= pd.read_csv('test.csv')
 d = d.drop(['Pclass','Name','Sex','Age','SibSp','Parch','Fare', 'Cabin', 'Ticket', 'Embarked'], axis=1)
 d['Survived'] = y_pred
-csv_name='XGBoost'
+csv_name='ANN'
 d.to_csv(csv_name, index=False)
